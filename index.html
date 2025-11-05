@@ -3955,11 +3955,11 @@
                             baseParams = currentLock.params;
                             baseFX = currentLock.fx;
                         } else {
-                            const morphedState = getMorphedState(track);
-                            baseEngine = morphedState.engine;
-                            baseParams = morphedState.params;
-                            baseFX = morphedState.fx;
-                        }
+                            // Hybrid: frozen synth params, live FX
+                            baseEngine = track.normalState.engine;
+                            baseParams = track.normalState.params;
+                            baseFX = track.fx;  // ← Use current FX, not normalState.fx
+}
                         
                         const slideEnabled = track.stepSlides[state.currentStep];
                         
@@ -3985,14 +3985,11 @@
                                     targetEngine = nextLock.engine;
                                     targetParams = nextLock.params;
                                     targetFX = nextLock.fx;
-                                } else if (track.normalState) {
+                                } else {
+                                    // Hybrid: frozen synth params, live FX
                                     targetEngine = track.normalState.engine;
                                     targetParams = track.normalState.params;
-                                    targetFX = track.normalState.fx;
-                                } else {
-                                    targetEngine = track.engine;
-                                    targetParams = track.params;
-                                    targetFX = track.fx;
+                                    targetFX = track.fx;  // ← Use current FX
                                 }
                                 
                                 audioEngine.playDrumWithSlide(
